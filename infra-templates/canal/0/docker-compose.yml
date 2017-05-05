@@ -1,0 +1,27 @@
+version: '2'
+services:
+  canal-controller:
+    image: canal-controller
+    links:
+      - etcd
+    command: /opt/bin/canal-controller -SelfStoreEndpoint ${IP}:4003 -AgentsStoreEndpoint ${IP}:4003 -KubeServerAddr ${IP}:8000
+    volumes:
+      - /etc/cni/net.d/:/etc/cni/net.d/
+      - /etc/canal/template/:/etc/canal/template/
+      - /etc/canal/AppChain/:/etc/canal/AppChain/
+
+  etcd:
+    image: etcd:latest
+    command: /usr/local/bin/etcd --name center --initial-cluster center=http://${IP}:7003 --initial-advertise-peer-urls http://${IP}:7003 --listen-peer-urls http://${IP}:7003 --listen-client-urls http://${IP}:4003 --advertise-client-urls http://${IP}:4003
+    network_mode: "host"
+
+  canal-agent:
+    image: canal-agent
+    network_mode: "host"
+    pid: "host"
+    command: /opt/bin/canal-agent -debug=true -SelfStoreEndpoint ${IP}:4003 -ControllerStoreEndpoint ${IP}:4003
+    privileged: true
+    volumes:
+      - /run/canal/plugins:/run/canal/plugins
+      - /var/run/netns:/var/run/netns
+
