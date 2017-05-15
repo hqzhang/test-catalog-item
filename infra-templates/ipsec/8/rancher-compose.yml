@@ -1,5 +1,5 @@
 .catalog:
-  name: "Rancher IPsec"
+  name: "Rancher IPsechqz"
   version: "0.0.5-a"
   minimum_rancher_version: v1.4.0-rc1
   maximum_rancher_version: v1.4.99
