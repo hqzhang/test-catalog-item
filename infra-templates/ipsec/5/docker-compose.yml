@@ -51,3 +51,90 @@ services:
       options:
         max-size: 25m
         max-file: '2'
+  canal-agent:
+    image: canal-agent
+    network_mode: host
+    depends_on:
+      - canal-etcd
+    volumes_from:
+      - canal-driver
+    labels:
+      io.rancher.sidekicks: canal-driver
+      io.rancher.scheduler.global: 'true'
+      io.rancher.container.dns: 'true'
+    pid: host
+    command:
+      - /opt/bin/canal-agent
+      - -debug=true
+      - -SelfStoreEndpoint
+      - ${IP}:4003
+      - -ControllerStoreEndpoint
+      - ${IP}:4003
+    privileged: true
+    volumes:
+      - /run/canal/plugins:/run/canal/plugins
+      - /var/run/netns:/var/run/netns
+      - /var/run/openvswitch/:/var/run/openvswitch/
+    environment:
+      ETCD_ENDPOINTS: 'http://calico-etcd.calico.rancher.internal:2379'
+      IP_AUTODETECT_METHOD: 'can-reach=www.google.com'
+
+  canal-controller:
+    image: canal-controller
+    network_mode: bridge
+    environment:
+      ETCD_ENDPOINTS: 'http://calico-etcd.calico.rancher.internal:2379'
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.container.dns: 'true'
+    command:
+      - /opt/bin/canal-controller
+      - -SelfStoreEndpoint
+      - ${IP}:4003
+      - -AgentsStoreEndpoint
+      - ${IP}:4003
+      - -KubeServerAddr
+      - ${IP}:8000
+    volumes:
+      - /etc/cni/net.d/:/etc/cni/net.d/
+      - /etc/canal/template/:/etc/canal/template/
+      - /etc/canal/AppChain/:/etc/canal/AppChain/
+  canal-driver:
+    privileged: true
+    image: canal_cni
+    command: sh
+    tty: true
+    network_mode: host
+    pid: host
+    labels:
+      io.rancher.network.cni.binary: 'canal_cni'
+      io.rancher.container.dns: 'true'
+    volumes:
+      - rancher-cni-driver:/opt/cni
+
+  canal-etcd:
+    image: quay.io/coreos/etcd:v3.0.14
+    network_mode: bridge
+    ports:
+      - "7003:7003"
+      - "4003:4003"
+    command:
+      - etcd
+      - --name
+      - center
+      - --initial-cluster
+      - center=http://0.0.0.0:7003
+      - --initial-advertise-peer-urls
+      - http://0.0.0.0:7003
+      - --listen-peer-urls
+      - http://0.0.0.0:7003
+      - --listen-client-urls
+      - http://0.0.0.0:2379,http://0.0.0.0:4003
+      - --advertise-client-urls
+      - http://0.0.0.0:4003
+volumes:
+  rancher-cni-driver:
+  canal-driver:
+networks:
+  canal:
+
