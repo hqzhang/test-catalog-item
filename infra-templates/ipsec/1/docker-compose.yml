@@ -1,5 +1,4 @@
 version: '2'
-#11
 services:
   ipsec:
     # IMPORTANT!!!! DO NOT CHANGE VERSION ON UPGRADE
@@ -29,13 +28,15 @@ services:
         max-file: '2'
   cni-driver:
     privileged: true
-    image: canal_cni
-    command: sh
-    volumes:
-      - rancher-cni-driver:/opt/cni/
-    tty: true
+    image: rancher/net:v0.8.1
+    command: sh -c "touch /var/log/rancher-ipam.log && exec tail ---disable-inotify -F /var/log/rancher-ipam.log"
     network_mode: host
     pid: host
     labels:
-      io.rancher.network.cni.binary: 'canal_cni'
+      io.rancher.network.cni.binary: 'rancher-bridge'
       io.rancher.container.dns: 'true'
+    logging:
+      driver: json-file
+      options:
+        max-size: 25m
+        max-file: '2'
