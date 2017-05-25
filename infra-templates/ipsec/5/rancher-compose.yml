@@ -1,5 +1,5 @@
 .catalog:
-  name: "Rancher IPsec"
+  name: "Rancher iCan"
   version: "0.1.0"
   minimum_rancher_version: v1.6.0-alpha1
   questions:
@@ -30,7 +30,7 @@
 
 ipsec:
   network_driver:
-    name: Rancher IPsec
+    name: Rancher iCan
     default_network:
       name: ipsec
       host_ports: true
