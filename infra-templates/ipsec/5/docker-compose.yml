@@ -58,9 +58,9 @@ services:
     depends_on:
       - canal-etcd
     volumes_from:
-      - cni-driver
+      - canal-driver
     labels:
-      io.rancher.sidekicks: cni-driver
+      io.rancher.sidekicks: canal-driver
       io.rancher.scheduler.global: 'true'
       io.rancher.container.dns: 'true'
     pid: host
@@ -98,7 +98,7 @@ services:
     environment:
       ETCD_ENDPOINTS: 'http://calico-etcd.calico.rancher.internal:2379'
 
-  cni-driver:
+  canal-driver:
     privileged: true
     image: canal_cni
     command: sh
