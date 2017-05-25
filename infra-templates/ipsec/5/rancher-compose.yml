@@ -43,7 +43,7 @@ ipsec:
     cni_config:
       '10-rancher.conf':
         name: rancher-cni-network
-        type: canal_cni
+        type: rancher-bridge
         bridge: $DOCKER_BRIDGE
         bridgeSubnet: $SUBNET
         logToFile: /var/log/rancher-cni.log
