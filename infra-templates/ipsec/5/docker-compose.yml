@@ -113,21 +113,25 @@ services:
 
   canal-etcd:
     image: quay.io/coreos/etcd:v3.0.14
-    network_mode: host
-    command: 
-      - etcd 
-      - --name 
-      - center 
-      - --initial-cluster 
-      - center=http://${IP}:7003 
-      - --initial-advertise-peer-urls 
-      - http://${IP}:7003 
-      - --listen-peer-urls 
-      - http://${IP}:7003 
-      - --listen-client-urls 
-      - http://${IP}:4003 
-      - --advertise-client-urls 
-      - http://${IP}:4003
+    network_mode: bridge
+    ports:
+      - "7003:7003"
+      - "4003:4003"
+    command:
+      - etcd
+      - --name
+      - center
+      - --initial-cluster
+      - center=http://0.0.0.0:7003
+      - --initial-advertise-peer-urls
+      - http://0.0.0.0:7003
+      - --listen-peer-urls
+      - http://0.0.0.0:7003
+      - --listen-client-urls
+      - http://0.0.0.0:2379,http://0.0.0.0:4003
+      - --advertise-client-urls
+      - http://0.0.0.0:4003
+
 volumes:
   rancher-cni-driver:
 
