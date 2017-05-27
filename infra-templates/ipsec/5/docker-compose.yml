@@ -114,6 +114,10 @@ services:
   canal-etcd:
     image: quay.io/coreos/etcd:v3.0.14
     network_mode: bridge
+    labels:
+        io.rancher.scheduler.affinity:host_label_soft: orchestration=true
+        io.rancher.container.create_agent: "true"
+        io.rancher.container.agent.role: environmentAdmin
     ports:
       - "7003:7003"
       - "4003:4003"
