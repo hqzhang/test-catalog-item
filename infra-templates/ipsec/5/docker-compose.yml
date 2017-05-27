@@ -82,7 +82,7 @@ services:
 
   canal-controller:
     image: canal-controller
-    network_mode: host
+    network_mode: bridge
     command:
       - /opt/bin/canal-controller
       - -SelfStoreEndpoint
